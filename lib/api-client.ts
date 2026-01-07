@@ -1,25 +1,21 @@
-'use client';
+"use client";
 
 import type {
   CreatePaymentIntentRequest,
   OrderResponse,
   PaymentIntentResponse,
-} from './types';
+} from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (!API_BASE_URL) {
-  throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+  throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined");
 }
 
 export class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-    public data?: unknown
-  ) {
+  constructor(public status: number, message: string, public data?: unknown) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -28,15 +24,13 @@ async function fetchApi<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token =
-    typeof window !== 'undefined'
-      ? localStorage.getItem('authToken')
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       ...(options.headers || {}),
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     },
   });
@@ -52,7 +46,7 @@ async function fetchApi<T>(
   if (!response.ok) {
     throw new ApiError(
       response.status,
-      data?.message ?? 'An error occurred',
+      data?.message ?? "An error occurred",
       data
     );
   }
@@ -62,16 +56,20 @@ async function fetchApi<T>(
 
 export const apiClient = {
   getOrder(orderId: string) {
-    return fetchApi<OrderResponse>(`/api/v1/orders/${orderId}`);
+    return fetchApi<OrderResponse>(`/api/v1/orders/${orderId}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "1",
+      },
+    });
   },
 
   createPaymentIntent(data: CreatePaymentIntentRequest) {
-    return fetchApi<PaymentIntentResponse>(
-      '/api/v1/payments/process',
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }
-    );
+    return fetchApi<PaymentIntentResponse>("/api/v1/payments/process", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "ngrok-skip-browser-warning": "1",
+      },
+    });
   },
 };
