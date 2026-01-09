@@ -1,0 +1,6 @@
+- Page heading should E-Commerce with suitable image
+- It can contain some related text
+- The page should instruct the user paste the orderId after the current URL to navigate to
+the order payment page.
+
+- Tech stack: Next.js, shadcn/ui
