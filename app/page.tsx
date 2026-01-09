@@ -1,51 +1,114 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
+  const router = useRouter();
+
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [tokenInput, setTokenInput] = useState("");
+  const [orderId, setOrderId] = useState("");
+
+  // Check for JWT token in localStorage on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      setAuthToken(storedToken);
+    }
+  }, []);
+
+  const handleSaveToken = () => {
+    if (!tokenInput.trim()) return;
+    localStorage.setItem("authToken", tokenInput.trim());
+    setAuthToken(tokenInput.trim());
+    setTokenInput("");
+  };
+
+  const handleOrderSubmit = () => {
+    if (!orderId.trim()) return;
+    router.push(`/${orderId.trim()}`);
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black px-6">
       <main className="w-full max-w-3xl">
-        <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <Card className="border-zinc-200 dark:border-zinc-800 shadow-md">
           <CardHeader className="text-center space-y-3">
             <CardTitle className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               E-Commerce Checkout
             </CardTitle>
             <p className="text-base text-zinc-600 dark:text-zinc-400">
-              A simple and secure payment experience
+              Secure and streamlined payment experience
             </p>
           </CardHeader>
 
-          <CardContent className="flex flex-col gap-8 text-center">
-            <p className="text-lg leading-8 text-zinc-700 dark:text-zinc-300">
-              This application demonstrates a modern e-commerce checkout flow
-              built using Next.js and Stripe. It allows users to securely
-              complete payments using a unique order reference.
+          <CardContent className="flex flex-col gap-10">
+            {/* Intro */}
+            <p className="text-lg leading-8 text-zinc-700 dark:text-zinc-300 text-center">
+              This checkout flow allows you to complete payments securely using
+              a valid authentication token and a unique order reference.
             </p>
 
-            <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 px-6 py-5">
-              <p className="mb-3 text-base font-medium text-zinc-900 dark:text-zinc-100">
-                How to continue with your payment
-              </p>
-              <p className="text-base leading-7 text-zinc-600 dark:text-zinc-400">
-                Please copy your <span className="font-medium">orderId</span>{" "}
-                and paste it at the end of the current URL in your browser’s
-                address bar.
+            {/* Auth Token Section */}
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 px-6 py-6 space-y-4">
+              <p className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+                Authentication Status
               </p>
 
-              <div className="mt-4 rounded-md bg-white dark:bg-black px-4 py-3 font-mono text-sm text-zinc-900 dark:text-zinc-100">
-                https://stripe-checkout-beta.vercel.app/
-                <span className="text-primary">orderId</span>
-              </div>
+              {authToken ? (
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    A valid JWT access token is available.
+                  </p>
+                  <Badge variant="secondary">Authenticated</Badge>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Please provide your JWT access token to continue.
+                  </p>
+                  <Input
+                    placeholder="Paste JWT access token"
+                    value={tokenInput}
+                    onChange={(e) => setTokenInput(e.target.value)}
+                  />
+                  <Button onClick={handleSaveToken} className="w-full">
+                    Save Token
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <p className="text-base leading-7 text-zinc-600 dark:text-zinc-400">
-              Once the order ID is added, you will be automatically redirected
-              to the secure payment page where you can complete your checkout.
-            </p>
+            {/* Order ID Section */}
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black px-6 py-6 space-y-4">
+              <p className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+                Order Payment
+              </p>
 
-            <div className="flex justify-center pt-2">
-              <Button variant="outline" size="lg" disabled>
-                Waiting for Order ID
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Enter your order ID below. You will be redirected to the secure
+                payment page automatically.
+              </p>
+
+              <Input
+                placeholder="Enter order ID"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+              />
+
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={handleOrderSubmit}
+                disabled={!orderId}
+              >
+                Proceed to Payment
               </Button>
             </div>
           </CardContent>

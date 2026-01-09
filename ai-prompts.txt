@@ -1,6 +1,11 @@
-- Page heading should E-Commerce with suitable image
-- It can contain some related text
-- The page should instruct the user paste the orderId after the current URL to navigate to
-the order payment page.
+- Add an input field to allow user provide JWT access token.
+    - Initially, we will check if there is a entry in browser localstorage
+      named `authToken`. The value of this entry will be JWT access token. if
+      the entry is not available the input field will appear.
+    - If JWT access token is available in browser localstorage then any suitable 
+      element will be shown informing that JWT access token is available.
 
-- Tech stack: Next.js, shadcn/ui
+- Add an input field to allow user provide the orderId. Once the orderId is provided and
+ submitted, redirect the user to `<currentURL>/<orderId>`.
+
+ Use a premium aesthetic local and feel.
